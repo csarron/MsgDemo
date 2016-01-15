@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +34,7 @@ public class PhoneActivity extends Activity implements MessageApi.MessageListene
     private View message2Button;
     private GoogleApiClient mPhoneApiClient;
 
-    private String remoteNodeId;
+    private String mPhoneRemoteNodeId;
 
     private static final String MSG_CAPABILITY_NAME = "msg_capability";
     private CapabilityApi.CapabilityListener mPhoneCapabilityListener;
@@ -91,7 +90,7 @@ public class PhoneActivity extends Activity implements MessageApi.MessageListene
 
     private void updateMsgCapability(CapabilityInfo capabilityInfo) {
         Set<Node> connectedNodes = capabilityInfo.getNodes();
-        remoteNodeId = pickBestNodeId(connectedNodes);
+        mPhoneRemoteNodeId = pickBestNodeId(connectedNodes);
     }
 
     private String pickBestNodeId(Set<Node> nodes) {
@@ -107,7 +106,7 @@ public class PhoneActivity extends Activity implements MessageApi.MessageListene
     }
 
     private void sendMsg(final String path, byte[] msg) {
-        Wearable.MessageApi.sendMessage(mPhoneApiClient, remoteNodeId, path, msg).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+        Wearable.MessageApi.sendMessage(mPhoneApiClient, mPhoneRemoteNodeId, path, msg).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if (sendMessageResult.getStatus().isSuccess())
@@ -147,7 +146,6 @@ public class PhoneActivity extends Activity implements MessageApi.MessageListene
     @Override
     public void onConnected(Bundle bundle) {
         MLog.d("onConnected");
-        Log.d("ori","onc");
         // Register Message listeners
         Wearable.MessageApi.addListener(mPhoneApiClient, this);
 
@@ -156,7 +154,7 @@ public class PhoneActivity extends Activity implements MessageApi.MessageListene
 //            @Override
 //            public void onSuccess(@NonNull CapabilityApi.GetCapabilityResult getCapabilityResult) {
 //                updateMsgCapability(getCapabilityResult.getCapability());
-//                if (remoteNodeId != null) {
+//                if (mPhoneRemoteNodeId != null) {
 //                    message1Button.setEnabled(true);
 //                    message2Button.setEnabled(true);
 //                }
@@ -173,7 +171,7 @@ public class PhoneActivity extends Activity implements MessageApi.MessageListene
             @Override
             public void onResult(@NonNull NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
                 if (getConnectedNodesResult.getStatus().isSuccess() && getConnectedNodesResult.getNodes().size() > 0) {
-                    remoteNodeId = getConnectedNodesResult.getNodes().get(0).getId();
+                    mPhoneRemoteNodeId = getConnectedNodesResult.getNodes().get(0).getId();
                     message1Button.setEnabled(true);
                     message2Button.setEnabled(true);
                 }

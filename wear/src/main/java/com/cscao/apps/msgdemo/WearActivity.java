@@ -34,7 +34,7 @@ public class WearActivity extends Activity implements MessageApi.MessageListener
     private View message1Button;
     private View message2Button;
 
-    private String remoteNodeId;
+    private String mWearNodeId;
 
     private static final String MSG_CAPABILITY_NAME = "msg_capability";
     private CapabilityApi.CapabilityListener mWearCapabilityListener;
@@ -89,7 +89,7 @@ public class WearActivity extends Activity implements MessageApi.MessageListener
 
     private void updateMsgCapability(CapabilityInfo capabilityInfo) {
         Set<Node> connectedNodes = capabilityInfo.getNodes();
-        remoteNodeId = pickBestNodeId(connectedNodes);
+        mWearNodeId = pickBestNodeId(connectedNodes);
     }
 
     private String pickBestNodeId(Set<Node> nodes) {
@@ -105,7 +105,7 @@ public class WearActivity extends Activity implements MessageApi.MessageListener
     }
 
     private void sendMsg(final String path, byte[] msg) {
-        Wearable.MessageApi.sendMessage(mWearApiClient, remoteNodeId, path, msg).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+        Wearable.MessageApi.sendMessage(mWearApiClient, mWearNodeId, path, msg).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if (sendMessageResult.getStatus().isSuccess())
@@ -149,28 +149,12 @@ public class WearActivity extends Activity implements MessageApi.MessageListener
         // Register Message listeners
         Wearable.MessageApi.addListener(mWearApiClient, this);
 
-//        // If there is a connected node, get it's id that is used when sending messages
-//        Wearable.CapabilityApi.getCapability(mWearApiClient, MSG_CAPABILITY_NAME, CapabilityApi.FILTER_REACHABLE).setResultCallback(new ResultCallbacks<CapabilityApi.GetCapabilityResult>() {
-//            @Override
-//            public void onSuccess(@NonNull CapabilityApi.GetCapabilityResult getCapabilityResult) {
-//                updateMsgCapability(getCapabilityResult.getCapability());
-//                if (remoteNodeId != null) {
-//                    message1Button.setEnabled(true);
-//                    message2Button.setEnabled(true);
-//                }
-//                MLog.d("result callback success");
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Status status) {
-//                MLog.d("result callback failed");
-//            }
-//        });
+        // If there is a connected node, get it's id that is used when sending messages
         Wearable.NodeApi.getConnectedNodes(mWearApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(@NonNull NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
                 if (getConnectedNodesResult.getStatus().isSuccess() && getConnectedNodesResult.getNodes().size() > 0) {
-                    remoteNodeId = getConnectedNodesResult.getNodes().get(0).getId();
+                    mWearNodeId = getConnectedNodesResult.getNodes().get(0).getId();
                     message1Button.setEnabled(true);
                     message2Button.setEnabled(true);
                 }
