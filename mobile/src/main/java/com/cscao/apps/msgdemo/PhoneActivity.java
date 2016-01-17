@@ -19,7 +19,6 @@ import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.Set;
@@ -149,34 +148,37 @@ public class PhoneActivity extends Activity implements MessageApi.MessageListene
         // Register Message listeners
         Wearable.MessageApi.addListener(mPhoneApiClient, this);
 
-//        // If there is a connected node, get it's id that is used when sending messages
-//        Wearable.CapabilityApi.getCapability(mPhoneApiClient,MSG_CAPABILITY_NAME, CapabilityApi.FILTER_REACHABLE).setResultCallback(new ResultCallbacks<CapabilityApi.GetCapabilityResult>() {
+        Wearable.CapabilityApi.getCapability(
+                mPhoneApiClient, MSG_CAPABILITY_NAME,
+                CapabilityApi.FILTER_REACHABLE).setResultCallback(
+                new ResultCallback<CapabilityApi.GetCapabilityResult>() {
+                    @Override
+                    public void onResult(@NonNull CapabilityApi.GetCapabilityResult result) {
+                        if (result.getStatus().isSuccess()) {
+                            updateMsgCapability(result.getCapability());
+                            if (result.getCapability().getNodes().size() > 0) {
+                                message1Button.setEnabled(true);
+                                message2Button.setEnabled(true);
+                            }
+                            MLog.d(result.getCapability().getNodes().toString());
+                        } else {
+                            MLog.d("Failed to get capabilities, "
+                                    + "status: "
+                                    + result.getStatus().getStatusMessage());
+                        }
+                    }
+                });
+
+//        Wearable.NodeApi.getConnectedNodes(mPhoneApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
 //            @Override
-//            public void onSuccess(@NonNull CapabilityApi.GetCapabilityResult getCapabilityResult) {
-//                updateMsgCapability(getCapabilityResult.getCapability());
-//                if (mPhoneRemoteNodeId != null) {
+//            public void onResult(@NonNull NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
+//                if (getConnectedNodesResult.getStatus().isSuccess() && getConnectedNodesResult.getNodes().size() > 0) {
+//                    mPhoneRemoteNodeId = getConnectedNodesResult.getNodes().get(0).getId();
 //                    message1Button.setEnabled(true);
 //                    message2Button.setEnabled(true);
 //                }
-//                MLog.d("result callback success");
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Status status) {
-//                MLog.d("result callback failed");
 //            }
 //        });
-
-        Wearable.NodeApi.getConnectedNodes(mPhoneApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-            @Override
-            public void onResult(@NonNull NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
-                if (getConnectedNodesResult.getStatus().isSuccess() && getConnectedNodesResult.getNodes().size() > 0) {
-                    mPhoneRemoteNodeId = getConnectedNodesResult.getNodes().get(0).getId();
-                    message1Button.setEnabled(true);
-                    message2Button.setEnabled(true);
-                }
-            }
-        });
     }
 
     //from GoogleApiClient.ConnectionCallbacks
