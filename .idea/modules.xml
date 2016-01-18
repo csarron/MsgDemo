@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MsgDemo.iml" filepath="$PROJECT_DIR$/MsgDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmswearapi/gmswearapi.iml" filepath="$PROJECT_DIR$/gmswearapi/gmswearapi.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
       <module fileurl="file://$PROJECT_DIR$/wear/wear.iml" filepath="$PROJECT_DIR$/wear/wear.iml" />
     </modules>
